@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHHARO Mental Health Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🫂 CHHARO Mental Health Support</h1>
+            <p>Your safe space to talk • We're here for you</p>
+            <button class="new-chat-btn" id="newChatButton">🗨️ New Chat</button>
+        </div>
+
+        <div class="crisis-banner" id="crisisBanner">
+            ⚠️ If you're in crisis, please reach out immediately: (+975) 02 332862 or enquiry@chharo.gov.bt
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h2>Welcome to CHHARO Support Chat</h2>
+                <p>I'm here to listen and support you. Feel free to share what's on your mind.</p>
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="sendQuickMessage('I need someone to talk to')">💬 Need to talk</div>
+                    <div class="quick-action" onclick="sendQuickMessage('I feel anxious')">😰 Feeling anxious</div>
+                    <div class="quick-action" onclick="sendQuickMessage('Tell me about mental health resources')">📚 Resources</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <div class="chat-input-wrapper">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Type your message here..."
+                >
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="chatbot.js"></script>
+</body>
+</html>

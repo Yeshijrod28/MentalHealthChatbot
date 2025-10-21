@@ -1,0 +1,25 @@
+# Environment files
+.env
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Storage index and cache
+storage/
+chat_log.csv
+# Virtual environments
+venv/
+.env/
+*.egg-info/
+
+# Node or frontend build files
+node_modules/
+dist/
+build/
+
+# System files
+.DS_Store
+Thumbs.db
