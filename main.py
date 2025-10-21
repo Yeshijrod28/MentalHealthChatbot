@@ -43,6 +43,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+app.mount("/static", StaticFiles(directory="chatbot-ui"), name="static")
 
 # Health check
 @app.get("/health")
@@ -52,8 +53,11 @@ async def health_check():
 # Home endpoint
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    return "<h2>CHHARO API is running ✅</h2><p>Use POST /chat to interact with the chatbot</p>"
-
+    try:
+        with open("chatbot-ui/index.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "<h2>CHHARO API is running ✅</h2><p>Use POST /chat to interact</p>"
 # Chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
