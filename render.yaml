@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: mental-health-chatbot
+    name: your-app-name
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --reload
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.9
+    buildCommand: |
+      apt-get update
+      apt-get install -y gfortran libopenblas-dev liblapack-dev
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: your-start-command
