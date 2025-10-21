@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
 
 # Import your modules
 from models import ChatRequest
