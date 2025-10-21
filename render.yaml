@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: mental-health-chatbot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --reload
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9
