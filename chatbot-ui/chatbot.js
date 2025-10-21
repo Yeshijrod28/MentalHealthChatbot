@@ -5,7 +5,9 @@ window.addEventListener('unhandledrejection', event => {
     }
 });
 
-const API_URL = 'http://127.0.0.1:8000/chat';
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://127.0.0.1:8000/chat'
+    : '/chat';
 const SESSION_ID = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
 let isProcessing = false;
