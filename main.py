@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 # Import your modules
 from models import ChatRequest
 from chat_engine import get_response
-from doc_engine import query_documents, initialize_index
+# from doc_engine import query_documents, initialize_index
 from crisis import contains_crisis_keywords, get_safety_message
 from logger import log_chat
 
