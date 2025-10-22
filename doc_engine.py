@@ -33,8 +33,6 @@ query_engine = None
 
 def initialize_index():
     """
-    Load or create a vector store index from the data directory.
-    """
     global query_engine
 
     try:
@@ -69,8 +67,7 @@ def initialize_index():
                 "---------------------\n"
                 "Given the context, answer this briefly in 1-2 sentences: {query_str}\n"
             )
-        )
-
+        ) """
         return True
 
     except Exception as e:
@@ -108,7 +105,7 @@ def query_documents(user_query: str) -> str:
 def reset_index():
     """
     Clear the cached index for regeneration.
-    """
+    
     global query_engine
 
     try:
@@ -118,7 +115,7 @@ def reset_index():
             print(f"✓ Deleted cached index at '{PERSIST_DIR}'")
 
         query_engine = None
-        print("✓ Index reset complete")
+        print("✓ Index reset complete") """
         return True
     except Exception as e:
         print(f"✗ Error resetting index: {e}")
