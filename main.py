@@ -19,7 +19,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Initializing document index...")
-    success = initialize_index()
+    success = True
     if success:
         print("✓ Document index ready")
     else:
@@ -47,8 +47,12 @@ async def health_check():
 async def home():
     return "<h2>CHHARO API is running ✅</h2><p>Use POST /chat to interact with the chatbot</p>"
 
+index_initialized = False
+
 @app.post("/chat")
 async def chat(request: ChatRequest):
+    global index_initialized
+
     try:
         session_id = request.session_id
         user_query = request.query.strip()
@@ -58,28 +62,30 @@ async def chat(request: ChatRequest):
 
         if contains_crisis_keywords(user_query):
             response_text = get_safety_message()
-            is_crisis = True
-            log_chat(session_id, user_query, response_text, is_crisis)
-            return {"response": response_text, "crisis": is_crisis}
+            log_chat(session_id, user_query, response_text, True)
+            return {"response": response_text, "crisis": True}
+
+        # Initialize index lazily (only on first query)
+        if not index_initialized:
+            print("🧠 Loading index on first query...")
+            initialize_index()
+            index_initialized = True
+            print("✓ Index loaded successfully")
 
         doc_response = query_documents(user_query)
-
-        if doc_response and len(doc_response.strip()) > 10:
-            context_query = f"User question: {user_query}\n\nBackground info (use this to inform your response, but keep your answer SHORT): {doc_response}"
-        else:
-            context_query = user_query
+        context_query = (
+            f"User question: {user_query}\n\nBackground info: {doc_response}"
+            if doc_response and len(doc_response.strip()) > 10
+            else user_query
+        )
 
         llm_response = get_response(session_id, context_query)
-        response_text = llm_response
-        is_crisis = False
-        log_chat(session_id, user_query, response_text, is_crisis)
-
-        return {"response": response_text, "crisis": is_crisis}
+        log_chat(session_id, user_query, llm_response, False)
+        return {"response": llm_response, "crisis": False}
 
     except Exception as e:
         print(f"Error in chat endpoint: {e}")
         return {"response": "I'm having trouble processing your request. Please try again.", "crisis": False}
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
