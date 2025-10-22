@@ -39,10 +39,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# IMPORTANT: Allow ALL origins for separate frontend deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://chharo-mentalhealthchatbot.onrender.com"],  # In production, replace with your frontend URL
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
