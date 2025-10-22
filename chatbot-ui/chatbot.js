@@ -5,10 +5,8 @@ window.addEventListener('unhandledrejection', event => {
     }
 });
 
-const BACKEND_URL = 'https://your-backend-app.onrender.com';
+const BACKEND_URL = 'https://chharomentalhealthchatbot.onrender.com;
 const API_URL = `${BACKEND_URL}/chat`;
-    ? 'https://chharomentalhealthchatbot.onrender.com'
-    : '/chat';
 const SESSION_ID = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
 let isProcessing = false;
