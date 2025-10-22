@@ -80,9 +80,6 @@ def initialize_index():
 
 def query_documents(user_query: str) -> str:
     """
-    Query the vector store for document-based answers.
-    Returns concise, relevant information only.
-    """
     global query_engine
 
     # Initialize index if not already
@@ -104,7 +101,7 @@ def query_documents(user_query: str) -> str:
         return ""
 
     except Exception as e:
-        print(f"Error querying documents: {e}")
+        print(f"Error querying documents: {e}") """
         return ""  # Silent failure, just return empty
 
 
