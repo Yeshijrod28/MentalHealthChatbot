@@ -10,7 +10,7 @@ DATA_DIR = "./data"
 PERSIST_DIR = "./storage"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-Settings.llm = Groq(model="llama-3.1-8b-instant", api_key=GROQ_API_KEY)
+Settings.llm = Groq(model="llama-3-1b-instant", api_key=GROQ_API_KEY)
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 query_engine = None
