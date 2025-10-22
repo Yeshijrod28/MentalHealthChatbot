@@ -17,7 +17,7 @@ from logger import log_chat
 load_dotenv()
 
 # Lifespan context manager to initialize on startup
-@asynccontextmanager
+""" @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Initialize the document index
     print("🚀 Initializing document index...")
@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
         print("⚠️ Warning: Document index initialization failed")
     yield
     # Shutdown: cleanup if needed
-    print("👋 Shutting down...")
+    print("👋 Shutting down...") """
 
 # Initialize FastAPI with lifespan
 app = FastAPI(
