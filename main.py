@@ -18,19 +18,11 @@ load_dotenv()
 # Startup/shutdown lifecycle
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 Initializing document index...")
-    success = True
-    if success:
-        print("✓ Document index ready")
-    else:
-        print("⚠️ Warning: Document index initialization failed")
-    yield
-    print("👋 Shutting down...")
+    yield  # Lazy load index on first query to save memory
 
-# App instance
 app = FastAPI(title="CHHARO Mental Health Chatbot API", lifespan=lifespan)
 
-# CORS middleware
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -52,25 +44,22 @@ index_initialized = False
 @app.post("/chat")
 async def chat(request: ChatRequest):
     global index_initialized
-
     try:
         session_id = request.session_id
         user_query = request.query.strip()
-
         if not user_query:
-            return {"response": "Please type something to start the conversation.", "crisis": False}
+            return {"response": "Please type something.", "crisis": False}
 
         if contains_crisis_keywords(user_query):
             response_text = get_safety_message()
             log_chat(session_id, user_query, response_text, True)
             return {"response": response_text, "crisis": True}
 
-        # Initialize index lazily (only on first query)
+        # Lazy load index
         if not index_initialized:
-            print("🧠 Loading index on first query...")
+            print("🧠 Loading index...")
             initialize_index()
             index_initialized = True
-            print("✓ Index loaded successfully")
 
         doc_response = query_documents(user_query)
         context_query = (
@@ -78,14 +67,13 @@ async def chat(request: ChatRequest):
             if doc_response and len(doc_response.strip()) > 10
             else user_query
         )
-
         llm_response = get_response(session_id, context_query)
         log_chat(session_id, user_query, llm_response, False)
         return {"response": llm_response, "crisis": False}
 
     except Exception as e:
         print(f"Error in chat endpoint: {e}")
-        return {"response": "I'm having trouble processing your request. Please try again.", "crisis": False}
+        return {"response": "I'm having trouble processing your request.", "crisis": False}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
