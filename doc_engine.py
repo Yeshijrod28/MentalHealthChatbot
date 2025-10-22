@@ -1,23 +1,15 @@
 import os
-from llama_index.core import (
-    VectorStoreIndex,
-    SimpleDirectoryReader,
-    StorageContext,
-    load_index_from_storage,
-    Settings
-)
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, Settings
 from llama_index.llms.groq import Groq
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from dotenv import load_dotenv
 
-# Load env vars
 load_dotenv()
 
 DATA_DIR = "./data"
 PERSIST_DIR = "./storage"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Configure LLM + Embedding
 Settings.llm = Groq(model="llama-3.1-8b-instant", api_key=GROQ_API_KEY)
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
@@ -27,55 +19,29 @@ def initialize_index():
     global query_engine
     try:
         if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
-            print("Loading existing index from storage...")
             storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
             index = load_index_from_storage(storage_context)
-            print("✓ Index loaded successfully")
         else:
-            print("Creating new index from documents...")
-            if not os.path.exists(DATA_DIR):
-                raise FileNotFoundError(f"Data directory '{DATA_DIR}' not found")
             documents = SimpleDirectoryReader(DATA_DIR).load_data()
-            if not documents:
-                raise ValueError(f"No documents found in '{DATA_DIR}'")
-            print(f"Found {len(documents)} document(s)")
             index = VectorStoreIndex.from_documents(documents)
             index.storage_context.persist(persist_dir=PERSIST_DIR)
-            print(f"✓ Index created and saved to '{PERSIST_DIR}'")
         query_engine = index.as_query_engine(similarity_top_k=2, response_mode="compact")
         return True
     except Exception as e:
-        print(f"✗ Error initializing index: {e}")
+        print(f"Error initializing index: {e}")
         return False
 
 def query_documents(user_query: str) -> str:
     global query_engine
     if query_engine is None:
-        success = initialize_index()
-        if not success:
+        if not initialize_index():
             return ""
     try:
         if not user_query.strip():
             return ""
         response = query_engine.query(user_query)
         result = str(response).strip()
-        if len(result) > 20 and len(result) < 500:
-            return result
-        return ""
+        return result if 20 < len(result) < 500 else ""
     except Exception as e:
         print(f"Error querying documents: {e}")
         return ""
-
-def reset_index():
-    global query_engine
-    try:
-        if os.path.exists(PERSIST_DIR):
-            import shutil
-            shutil.rmtree(PERSIST_DIR)
-            print(f"✓ Deleted cached index at '{PERSIST_DIR}'")
-        query_engine = None
-        print("✓ Index reset complete")
-        return True
-    except Exception as e:
-        print(f"✗ Error resetting index: {e}")
-        return False
