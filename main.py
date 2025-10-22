@@ -62,41 +62,25 @@ async def home():
 # Chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    try:
-        session_id = request.session_id
-        user_query = request.query.strip()
+    session_id = request.session_id
+    user_query = request.query
 
-        # Check for empty query
-        if not user_query:
-            return {"response": "Please type something to start the conversation.", "crisis": False}
+    if contains_crisis_keywords(user_query):
+        response_text = get_safety_message()
+        is_crisis = True
+    else:
+        try:
+            # Just conversational chat (no docs)
+            llm_response = get_response(session_id, user_query)
+            response_text = llm_response
+            is_crisis = False
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            response_text = "I'm here to support you. How can I help today?"
+            is_crisis = False
 
-        # Check crisis keywords FIRST
-        if contains_crisis_keywords(user_query):
-            response_text = get_safety_message()
-            is_crisis = True
-            log_chat(session_id, user_query, response_text, is_crisis)
-            return {"response": response_text, "crisis": is_crisis}
-
-        # Get document-based info (silently, for context only)
-        doc_response = query_documents(user_query)
-
-        # Get AI response with hidden document context
-        # Only pass doc context to LLM, don't show it to user
-        if doc_response and len(doc_response.strip()) > 10:
-            context_query = f"User question: {user_query}\n\nBackground info (use this to inform your response, but keep your answer SHORT): {doc_response}"
-        else:
-            context_query = user_query
-            
-        llm_response = get_response(session_id, context_query)
-
-        # Return ONLY the LLM response (no document text shown)
-        response_text = llm_response
-        is_crisis = False
-
-        # Log the chat
-        log_chat(session_id, user_query, response_text, is_crisis)
-
-        return {"response": response_text, "crisis": is_crisis}
+    log_chat(session_id, user_query, response_text, is_crisis)
+    return {"response": response_text, "crisis": is_crisis}
     
     except Exception as e:
         print(f"Error in chat endpoint: {e}")
