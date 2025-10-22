@@ -74,7 +74,3 @@ async def chat(request: ChatRequest):
     except Exception as e:
         print(f"Error in chat endpoint: {e}")
         return {"response": "I'm having trouble processing your request.", "crisis": False}
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
