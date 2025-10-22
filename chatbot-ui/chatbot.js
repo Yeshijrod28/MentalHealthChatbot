@@ -5,7 +5,8 @@ window.addEventListener('unhandledrejection', event => {
     }
 });
 
-const API_URL = window.location.hostname === 'localhost' 
+const BACKEND_URL = 'https://your-backend-app.onrender.com';
+const API_URL = `${BACKEND_URL}/chat`;
     ? 'https://chharomentalhealthchatbot.onrender.com'
     : '/chat';
 const SESSION_ID = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -19,6 +20,18 @@ const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 const crisisBanner = document.getElementById('crisisBanner');
 
+//Test backend connection on load
+async function testConnection() {
+    try {
+        console.log('🔍 Testing backend connection...');
+        const response = await fetch(`${BACKEND_URL}/health`);
+        const data = await response.json();
+        console.log('✅ Backend connected:', data);
+    } catch (error) {
+        console.error('❌ Backend connection failed:', error);
+        addMessage('⚠️ Cannot connect to backend. Please check if the backend URL is correct.', 'bot');
+    }
+}
 // Send message to backend
 async function sendMessage() {
     const message = chatInput.value.trim();
