@@ -81,13 +81,7 @@ async def chat(request: ChatRequest):
 
     log_chat(session_id, user_query, response_text, is_crisis)
     return {"response": response_text, "crisis": is_crisis}
-    
-    except Exception as e:
-        print(f"Error in chat endpoint: {e}")
-        return {
-            "response": "I'm having trouble processing your request. Please try again.",
-            "crisis": False
-        }
+
 
 if __name__ == "__main__":
     import uvicorn
