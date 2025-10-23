@@ -1,12 +1,10 @@
 import os
 from dotenv import load_dotenv
-""" 
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-"""
-from llama_index.llms.groq import Groq
+
 # Load .env
 load_dotenv()
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
@@ -15,57 +13,13 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 llm = ChatGroq(
     groq_api_key=GROQ_API_KEY,
     model_name="llama-3.1-8b-instant",
+    temperature=0.6,
+    max_tokens=150
 )
 
 # Store session chat histories
 session_store = {}
 
-system_prompt = (
-    "You are a compassionate Bhutanese mental health support chatbot.\n\n"
-    "RULES:\n"
-    "- Keep responses SHORT (2-3 sentences maximum)\n"
-    "- Be warm and empathetic but CONCISE\n"
-    "- Only use 'Kuzu zangpo' once per new user\n"
-    "- No bullet points or numbered lists\n"
-    "- Ask one gentle follow-up question\n"
-    "- Encourage professional help when appropriate\n"
-)
-def get_response(session_id: str, user_query: str) -> str:
-    """Get a response from the chatbot with conversation history."""
-    try:
-        # Load chat history for context
-        history = session_store.get(session_id, [])
-
-        # Build the prompt including history
-        full_prompt = SYSTEM_PROMPT + "\n"
-        for msg in history[-5:]:
-            full_prompt += f"User: {msg['user']}\nBot: {msg['bot']}\n"
-        full_prompt += f"User: {user_query}\nBot:"
-
-        # Query the LLM
-        response = llm.complete(full_prompt)
-        answer = response.text.strip()
-
-        # Save conversation
-        session_store.setdefault(session_id, []).append({
-            "user": user_query,
-            "bot": answer
-        })
-
-        return answer
-
-    except Exception as e:
-        print(f"Error in get_response: {e}")
-        return "I'm sorry, something went wrong. Could you try again?"
-
-def clear_session(session_id: str) -> bool:
-    """Clear chat history for a session."""
-    if session_id in session_store:
-        del session_store[session_id]
-        return True
-    return False
-
-"""
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     # Get or create chat history for a session.
     if session_id not in session_store:
@@ -106,3 +60,30 @@ conversational_chain = RunnableWithMessageHistory(
     input_messages_key="input",
     history_messages_key="history"
 )
+def get_response(session_id: str, user_query: str) -> str:
+    """
+    Get a response from the chatbot with conversation history.
+    
+    Args:
+        session_id: Unique identifier for the conversation session
+        user_query: The user's input query (may include document context)
+        
+    Returns:
+        The chatbot's response as a string
+    """
+    try:
+        response = conversational_chain.invoke(
+            {"input": user_query},
+            config={"configurable": {"session_id": session_id}}
+        )
+        return response.content
+    except Exception as e:
+        print(f"Error in get_response: {e}")
+        return "I'm having trouble right now. Could you try saying that again?"
+
+def clear_session(session_id: str) -> bool:
+    """Clear chat history for a specific session."""
+    if session_id in session_store:
+        del session_store[session_id]
+        return True
+    return False
