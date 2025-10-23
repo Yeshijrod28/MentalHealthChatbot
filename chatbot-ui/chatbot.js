@@ -142,6 +142,7 @@ function sendQuickMessage(message) {
 
 // Focus input on load
 document.addEventListener('DOMContentLoaded', () => {
+    testConnection();
     chatInput.focus();
 });
 
