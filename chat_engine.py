@@ -20,16 +20,7 @@ llm = ChatGroq(
 # Store session chat histories
 session_store = {}
 
-def get_response(session_id: str, user_query: str) -> str:
-    """
-    Get a short, empathetic response from the chatbot.
-    """
-    try:
-        # Load chat history for context
-        history = session_store.get(session_id, [])
-
-        # Build the prompt
-        system_prompt = (
+system_prompt = (
             "You are a compassionate Bhutanese mental health support chatbot.\n\n"
             "RULES:\n"
             "- Keep responses SHORT (2-3 sentences maximum)\n"
@@ -39,14 +30,19 @@ def get_response(session_id: str, user_query: str) -> str:
             "- Ask one gentle follow-up question\n"
             "- Encourage professional help when appropriate\n"
         )
+def get_response(session_id: str, user_query: str) -> str:
+    """Get a response from the chatbot with conversation history."""
+    try:
+        # Load chat history for context
+        history = session_store.get(session_id, [])
 
-        # Combine system + history + new input
-        full_prompt = system_prompt + "\n\n"
+        # Build the prompt including history
+        full_prompt = SYSTEM_PROMPT + "\n"
         for msg in history[-5:]:
             full_prompt += f"User: {msg['user']}\nBot: {msg['bot']}\n"
         full_prompt += f"User: {user_query}\nBot:"
 
-        # Query the model
+        # Query the LLM
         response = llm.complete(full_prompt)
         answer = response.text.strip()
 
@@ -63,11 +59,12 @@ def get_response(session_id: str, user_query: str) -> str:
         return "I'm sorry, something went wrong. Could you try again?"
 
 def clear_session(session_id: str) -> bool:
-    """Clear chat history for a specific session."""
+    """Clear chat history for a session."""
     if session_id in session_store:
         del session_store[session_id]
         return True
     return False
+
 """
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     # Get or create chat history for a session.
