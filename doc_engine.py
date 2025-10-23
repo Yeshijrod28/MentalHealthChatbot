@@ -3,6 +3,8 @@ import os
 from llama_index.llms.groq import Groq
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding """
 import math
+from groq import Groq
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
