@@ -13,9 +13,4 @@ An AI-powered mental health support chatbot that offers emotional assistance and
 
 ---
 
-## ⚙️ Setup Instructions
-
-### 1. Backend
-```bash
-pip install -r requirements.txt
-uvicorn main:app --reload
+## 🔗Live Url: https://chharo-mentalhealthchatbot.onrender.com/
