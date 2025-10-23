@@ -40,6 +40,12 @@ jiter==0.11.1
 joblib==1.5.2
 jsonpatch==1.33
 jsonpointer==3.0.0
+langchain==0.3.27
+langchain-community==0.3.31
+langchain-core==0.3.79
+langchain-groq==0.3.8
+langchain-openai==0.3.35
+langchain-text-splitters==0.3.11
 langsmith==0.4.37
 llama-cloud==0.1.35
 llama-cloud-services==0.6.54
@@ -64,6 +70,8 @@ mypy_extensions==1.1.0
 nest-asyncio==1.6.0
 networkx==3.2.1
 nltk==3.9.2
+numpy==2.0.2
+openai==1.109.1
 orjson==3.11.3
 packaging==25.0
 pillow==11.3.0
@@ -107,5 +115,3 @@ websockets==15.0.1
 wrapt==1.17.3
 yarl==1.22.0
 zstandard==0.25.0
-
-
