@@ -1,15 +1,95 @@
 import os
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, Settings
+""" from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, Settings
 from llama_index.llms.groq import Groq
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding """
+import math
 from dotenv import load_dotenv
 
 load_dotenv()
 
 DATA_DIR = "./data"
-PERSIST_DIR = "./storage"
+#PERSIST_DIR = "./storage"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+    
+documents = []
+for file_name in os.listdir(DATA_DIR):
+    if file_name.endswith(".txt"):
+        with open(os.path.join(DATA_DIR, file_name), "r", encoding="utf-8") as f:
+            text = f.read().strip()
+            if len(text) > 50:
+                documents.append(text)
+
+# ✅ Basic text embedding using Groq LLM (or fallback)
+client = Groq(api_key=GROQ_API_KEY)
+
+
+def cosine_similarity(a, b):
+    """Compute basic cosine similarity between two text vectors"""
+    a_words = set(a.lower().split())
+    b_words = set(b.lower().split())
+    return len(a_words & b_words) / math.sqrt(len(a_words) * len(b_words) + 1)
+    
+def get_top_context(query, top_k=1):
+    if not documents:
+        return ""
+
+    scored = sorted(
+        [(doc, cosine_similarity(doc, query)) for doc in documents],
+        key=lambda x: x[1],
+        reverse=True
+    )
+    best_docs = [d for d, s in scored[:top_k] if s > 0]
+    return "\n\n".join(best_docs) if best_docs else ""
+
+def query_documents(user_query: str) -> str:
+    # global query_engine
+    """ if query_engine is None:
+        if not initialize_index():
+            return ""
+    try:
+        if not user_query.strip():
+            return ""
+        
+        response = query_engine.query(user_query)
+        result = str(response).strip()
+        
+        # Return result if it's meaningful
+        return result if 20 < len(result) < 500 else ""
+    """
+     try:
+        context = get_top_context(user_query)
+        if not context:
+            return ""
+
+        prompt = f"""
+        You are a compassionate mental health assistant.
+        Use the context below to provide a kind, short answer.
+
+        Context:
+        {context}
+
+        User: {user_query}
+        """
+
+        response = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.6,
+            max_tokens=250,
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        print(f"❌ Error querying documents: {e}")
+        return "" 
+
+
+"""
 query_engine = None
 _settings_initialized = False
 
@@ -23,7 +103,7 @@ def _initialize_settings():
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             cache_folder="./model_cache"
         )
-        _settings_initialized = True
+        _settings_initialized = True 
 
 def initialize_index():
     global query_engine
@@ -49,22 +129,3 @@ def initialize_index():
         import traceback
         traceback.print_exc()
         return False
-
-def query_documents(user_query: str) -> str:
-    global query_engine
-    if query_engine is None:
-        if not initialize_index():
-            return ""
-    
-    try:
-        if not user_query.strip():
-            return ""
-        
-        response = query_engine.query(user_query)
-        result = str(response).strip()
-        
-        # Return result if it's meaningful
-        return result if 20 < len(result) < 500 else ""
-    except Exception as e:
-        print(f"❌ Error querying documents: {e}")
-        return ""
