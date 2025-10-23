@@ -5,7 +5,7 @@ window.addEventListener('unhandledrejection', event => {
     }
 });
 
-const BACKEND_URL = 'https://chharomentalhealthchatbot.onrender.com;
+const BACKEND_URL = 'https://chharomentalhealthchatbot.onrender.com';
 const API_URL = `${BACKEND_URL}/chat`;
 const SESSION_ID = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
