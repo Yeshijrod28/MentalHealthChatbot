@@ -88,8 +88,9 @@ async def chat(request: ChatRequest):
                 "response": response_text,
                 "crisis": True
             })
-        doc_response = "" try: f
-            rom doc_engine import query_documents 
+        doc_response = "" 
+        try: 
+            from doc_engine import query_documents 
             doc_response = query_documents(user_query) 
             if doc_response: print(f"📚 Document context: {len(doc_response)} chars") except Exception as e: print(f"ℹ️ No document search: {e}") 
             # Build query with context if available 
