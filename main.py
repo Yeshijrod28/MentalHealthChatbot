@@ -11,10 +11,6 @@ from chat_engine import get_response
 from crisis import contains_crisis_keywords, get_safety_message
 from logger import log_chat
 
-print("=" * 50)
-print("🚀 CHHARO Backend API Starting...")
-print("=" * 50)
-
 # Load environment variables
 load_dotenv()
 
@@ -72,12 +68,6 @@ async def health_check():
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    """Main chat endpoint"""
-    print(f"\n{'='*50}")
-    print(f"📥 POST /chat")
-    print(f"Session: {request.session_id}")
-    print(f"Query: {request.query[:100]}...")
-    print(f"{'='*50}")
     
     try:
         session_id = request.session_id
@@ -98,8 +88,6 @@ async def chat(request: ChatRequest):
                 "response": response_text,
                 "crisis": True
             })
-        
-        doc_response = ""
         
         # Get LLM response
         print("🤖 Calling Groq LLM...")
